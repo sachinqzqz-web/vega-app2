@@ -68,3 +68,14 @@ it('respects notification preferences when a source rate-limits an automatic che
   await expect(updateProvidersService.checkForUpdatesAndAutoUpdate()).rejects.toThrow('rate limit');
   expect(notificationService.displayUpdateNotification).not.toHaveBeenCalled();
 });
+
+it('preserves the exact update failure for the manual error dialog', async () => {
+  const error = new Error('Provider files are not synchronized: posts.js belongs to uhd v2.1, expected uhd v2.2.');
+  jest.mocked(extensionManager.updateProvider).mockRejectedValue(error);
+  await expect(updateProvidersService.updateProvider(provider(), {throwOnError: true})).rejects.toBe(error);
+});
+it('keeps a failed background update from aborting the batch', async () => {
+  jest.mocked(extensionManager.updateProvider).mockRejectedValue(new Error('Provider files are not synchronized'));
+  const result = await updateProvidersService.updateProviders([provider()], {automatic: true, showNotifications: false});
+  expect(result.failed).toEqual([provider()]);
+});

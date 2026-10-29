@@ -130,7 +130,7 @@ class UpdateProvidersService {
   /**
    * Update a specific provider
    */
-  async updateProvider(provider: ProviderExtension, options?: {automatic?: boolean}): Promise<boolean> {
+  async updateProvider(provider: ProviderExtension, options?: {automatic?: boolean; throwOnError?: boolean}): Promise<boolean> {
     try {
       if (options?.automatic && !settingsStorage.isProviderAutoUpdateEnabled()) return false;
       return await extensionManager.updateProvider(provider, options?.automatic ? () => settingsStorage.isProviderAutoUpdateEnabled() : undefined);
@@ -142,6 +142,7 @@ class UpdateProvidersService {
         throw error;
       }
       console.error('Error updating provider:', error);
+      if (options?.throwOnError) throw error;
       return false;
     }
   }
