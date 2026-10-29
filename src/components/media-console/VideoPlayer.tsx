@@ -209,6 +209,11 @@ const AnimatedVideoPlayer = (
   const videoZoomProps = useAnimatedProps(() => ({
     videoZoom: zoomScale.value,
   }));
+  // Ambient bars use the original fitted bounds. Transform them with the
+  // video so their opaque fill cannot cover the expanded picture.
+  const ambientZoomAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{scale: zoomScale.value}],
+  }));
 
   const videoRef = props.videoRef || _videoRef;
 
@@ -1040,8 +1045,10 @@ const AnimatedVideoPlayer = (
             viewType={Platform.OS === 'android' ? ViewType.SURFACE : props.viewType}
           />
           {Platform.OS === 'android' && ambientConfig.enabled && !ambientDisabled && !ambientPip && sourceUri && (
-            <AmbientBackground key={String(sourceUri)} videoView={ambientView} bars={ambientBars}
-              paused={_paused || playbackSuspended || loading || buffering} intensity={ambientConfig.intensity} spread={ambientConfig.spread} responseMs={ambientConfig.responseMs} />
+            <Animated.View pointerEvents="none" style={[_styles.player.video, ambientZoomAnimatedStyle]}>
+              <AmbientBackground key={String(sourceUri)} videoView={ambientView} bars={ambientBars}
+                paused={_paused || playbackSuspended || loading || buffering} intensity={ambientConfig.intensity} spread={ambientConfig.spread} responseMs={ambientConfig.responseMs} />
+            </Animated.View>
           )}
         </Animated.View>
         {!hideAllControlls && !disableOverlay && <Overlay animations={animations} />}
