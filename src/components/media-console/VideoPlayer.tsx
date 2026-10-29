@@ -40,12 +40,14 @@ import type {VideoPlayerProps, WithRequiredProperty} from './types';
 import Gestures from './components/Gestures';
 import Animated, {
   useAnimatedStyle,
+  useAnimatedProps,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 
 const volumeWidth = 150;
 const iconOffset = 0;
+const AnimatedVideo = Animated.createAnimatedComponent(Video);
 
 const AnimatedVideoPlayer = (
   props: WithRequiredProperty<VideoPlayerProps, 'animations'>,
@@ -202,7 +204,10 @@ const AnimatedVideoPlayer = (
   const zoomStartScale = useSharedValue(1);
 
   const zoomAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{scale: zoomScale.value}],
+    transform: [{scale: Platform.OS === 'android' ? 1 : zoomScale.value}],
+  }));
+  const videoZoomProps = useAnimatedProps(() => ({
+    videoZoom: zoomScale.value,
   }));
 
   const videoRef = props.videoRef || _videoRef;
@@ -1015,10 +1020,11 @@ const AnimatedVideoPlayer = (
           ref={ambientView} collapsable={false}
           pointerEvents="none"
           style={[_styles.player.video, zoomAnimatedStyle]}>
-          <Video
+          <AnimatedVideo
             controls={false}
             {...props}
             {...events}
+            animatedProps={Platform.OS === 'android' ? videoZoomProps : undefined}
             ref={videoRef || _videoRef}
             resizeMode={resizeMode}
             volume={_volume * (volumeBoostAvailable ? volumeBoost : 1)}

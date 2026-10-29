@@ -121,7 +121,7 @@ export default function ManagedEpisodeRow({
           onShowDetails={selecting ? undefined : onShowDetails}
         />
       </TVFocusable>
-      {!selecting && onShowDetails && (
+      {isTV && !selecting && onShowDetails && (
         <TVFocusable
           accessibilityRole="button"
           accessibilityLabel={`Show full description for ${title}`}
