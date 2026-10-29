@@ -21,6 +21,7 @@ import {
   isDetailedLoggingEnabled,
   setDetailedLogging,
   shareLogs,
+  clearLogs,
 } from '../../lib/logging/vegaLog';
 import {useRemoteStore} from '../../lib/remote/remoteStore';
 
@@ -202,6 +203,19 @@ const About = ({navigation}: any) => {
     isDetailedLoggingEnabled,
   );
   const [exportingLogs, setExportingLogs] = useState(false);
+  const [clearingLogs, setClearingLogs] = useState(false);
+
+  const handleClearLogs = async () => {
+    setClearingLogs(true);
+    try {
+      await clearLogs();
+      ToastAndroid.show('Logs cleared', ToastAndroid.SHORT);
+    } catch (error: any) {
+      ToastAndroid.show(error?.message || 'Could not clear logs', ToastAndroid.SHORT);
+    } finally {
+      setClearingLogs(false);
+    }
+  };
 
   const exportLogs = async () => {
     setExportingLogs(true);
@@ -348,11 +362,18 @@ const About = ({navigation}: any) => {
               title="Export logs"
               description="Share recent app logs with the developer. Links and sign-in data are removed."
               icon="file-document-outline"
-              divider={false}
               trailing={
                 exportingLogs ? <LoadingIndicator size={14} /> : undefined
               }
-              onPress={exportingLogs ? undefined : exportLogs}
+              onPress={exportingLogs || clearingLogs ? undefined : exportLogs}
+            />
+            <SettingsRow
+              title="Clear logs"
+              description="Clear old logs before reproducing a problem."
+              icon="delete-outline"
+              divider={false}
+              trailing={clearingLogs ? <LoadingIndicator size={14} /> : undefined}
+              onPress={clearingLogs || exportingLogs ? undefined : handleClearLogs}
             />
           </SettingsSection>
         )}
