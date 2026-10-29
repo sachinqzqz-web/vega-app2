@@ -10,7 +10,7 @@ import {
   Text,
   TextField,
 } from '@expo/ui/jetpack-compose';
-import {fillMaxWidth, menuAnchor} from '@expo/ui/jetpack-compose/modifiers';
+import {fillMaxWidth, menuAnchor, padding} from '@expo/ui/jetpack-compose/modifiers';
 import React, {useState, useEffect} from 'react';
 import {
   BackHandler,
@@ -348,6 +348,7 @@ const DropdownField = <T,>({
                   <DropdownMenuItem.Text>
                     <Text
                       color={selected ? colors.primary : colors.onSurface}
+                      modifiers={[padding(0, 10, 0, 10)]}
                       maxLines={showFullOptionLabels ? undefined : 2}
                       overflow={showFullOptionLabels ? undefined : 'ellipsis'}
                       softWrap={showFullOptionLabels}
